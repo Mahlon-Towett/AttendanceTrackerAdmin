@@ -2,13 +2,14 @@ import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 
+// Firebase configuration - matches your google-services.json exactly
 const firebaseConfig = {
-  apiKey: "your-api-key",
-  authDomain: "your-project.firebaseapp.com",
-  projectId: "your-project-id",
-  storageBucket: "your-project.appspot.com",
-  messagingSenderId: "123456789",
-  appId: "your-app-id"
+  apiKey: "AIzaSyCuYYHkuFTX2PB4RmHkWWFXNSwzpj15wBg",
+  authDomain: "attendance-system-demo-d6c09.firebaseapp.com",
+  projectId: "attendance-system-demo-d6c09",
+  storageBucket: "attendance-system-demo-d6c09.firebasestorage.app",
+  messagingSenderId: "348700373991",
+  appId: "1:348700373991:android:c3aa41943b402264a24342"
 };
 
 const app = initializeApp(firebaseConfig);
