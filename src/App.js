@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import AdminAuth from './components/AdminAuth';
 import AdminPanel from './components/AdminPanel';
 import { getAttendanceByDate, getEmployees, getAttendanceStats } from './services/attendanceService';
@@ -10,11 +10,8 @@ function App() {
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    loadData();
-  }, [selectedDate]);
-
-  const loadData = async () => {
+  // Use useCallback to prevent unnecessary re-renders
+  const loadData = useCallback(async () => {
     try {
       setLoading(true);
       const [attendance, employeeList, statsData] = await Promise.all([
@@ -31,7 +28,11 @@ function App() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedDate]); // Include selectedDate in dependencies
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]); // Now loadData is stable and won't cause infinite loops
 
   return (
     <AdminAuth>

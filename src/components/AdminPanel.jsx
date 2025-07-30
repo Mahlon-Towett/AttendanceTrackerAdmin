@@ -416,8 +416,8 @@ const AdminPanel = ({
               </div>
             </div>
 
-            {/* Employee Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Enhanced Employee Stats */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
@@ -453,40 +453,122 @@ const AdminPanel = ({
               <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
+                    <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                      <TrendingUp className="w-5 h-5 text-purple-600" />
+                    </div>
+                  </div>
+                  <div className="ml-4">
+                    <p className="text-sm font-medium text-gray-500">Admin Staff</p>
+                    <p className="text-2xl font-bold text-gray-900">
+                      {loading ? '...' : employees.filter(emp => emp.empCategory === 'Administrative Staff').length}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
                     <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
                       <AlertCircle className="w-5 h-5 text-orange-600" />
                     </div>
                   </div>
                   <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-500">Inactive</p>
+                    <p className="text-sm font-medium text-gray-500">Password Pending</p>
                     <p className="text-2xl font-bold text-gray-900">
-                      {loading ? '...' : employees.filter(emp => !emp.isActive).length}
+                      {loading ? '...' : employees.filter(emp => !emp.hasPassword).length}
                     </p>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Employees List */}
+            {/* Department & Category Breakdown */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Department Distribution</h3>
+                <div className="space-y-3">
+                  {loading ? (
+                    <div className="text-gray-500">Loading departments...</div>
+                  ) : (
+                    [...new Set(employees.map(emp => emp.department).filter(Boolean))]
+                      .slice(0, 5)
+                      .map(dept => {
+                        const count = employees.filter(emp => emp.department === dept).length;
+                        const percentage = ((count / employees.length) * 100).toFixed(1);
+                        return (
+                          <div key={dept} className="flex items-center justify-between">
+                            <div className="flex-1">
+                              <div className="text-sm font-medium text-gray-900 truncate">{dept}</div>
+                              <div className="w-full bg-gray-200 rounded-full h-2 mt-1">
+                                <div 
+                                  className="bg-blue-600 h-2 rounded-full" 
+                                  style={{ width: `${percentage}%` }}
+                                ></div>
+                              </div>
+                            </div>
+                            <div className="ml-3 text-sm font-semibold text-gray-600">
+                              {count}
+                            </div>
+                          </div>
+                        );
+                      })
+                  )}
+                </div>
+              </div>
+
+              <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Employment Categories</h3>
+                <div className="space-y-3">
+                  {loading ? (
+                    <div className="text-gray-500">Loading categories...</div>
+                  ) : (
+                    [...new Set(employees.map(emp => emp.empCategory).filter(Boolean))]
+                      .map(category => {
+                        const count = employees.filter(emp => emp.empCategory === category).length;
+                        const percentage = ((count / employees.length) * 100).toFixed(1);
+                        return (
+                          <div key={category} className="flex items-center justify-between">
+                            <div className="flex-1">
+                              <div className="text-sm font-medium text-gray-900">{category}</div>
+                              <div className="w-full bg-gray-200 rounded-full h-2 mt-1">
+                                <div 
+                                  className="bg-green-600 h-2 rounded-full" 
+                                  style={{ width: `${percentage}%` }}
+                                ></div>
+                              </div>
+                            </div>
+                            <div className="ml-3 text-sm font-semibold text-gray-600">
+                              {count} ({percentage}%)
+                            </div>
+                          </div>
+                        );
+                      })
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Enhanced Employees List */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
                     <tr>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Employee
+                        Employee Details
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Department
+                        Position & Department
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Role
+                        Contact & Location
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Status
+                        Employment Info
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Actions
+                        Status & Actions
                       </th>
                     </tr>
                   </thead>
@@ -513,47 +595,140 @@ const AdminPanel = ({
                     ) : (
                       employees.map((employee) => (
                         <tr key={employee.id} className="hover:bg-gray-50">
-                          <td className="px-6 py-4 whitespace-nowrap">
+                          {/* Employee Details */}
+                          <td className="px-6 py-4">
                             <div className="flex items-center">
-                              <div className="flex-shrink-0 h-10 w-10">
-                                <div className="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
-                                  <span className="text-sm font-medium text-gray-700">
-                                    {employee.name ? employee.name.charAt(0).toUpperCase() : 'N'}
+                              <div className="flex-shrink-0 h-12 w-12">
+                                <div className="h-12 w-12 rounded-full bg-gradient-to-r from-blue-400 to-purple-500 flex items-center justify-center">
+                                  <span className="text-sm font-medium text-white">
+                                    {employee.name ? employee.name.split(' ').map(n => n.charAt(0)).join('').slice(0, 2) : 'N'}
                                   </span>
                                 </div>
                               </div>
                               <div className="ml-4">
-                                <div className="text-sm font-medium text-gray-900">
+                                <div className="text-sm font-semibold text-gray-900">
                                   {employee.name || 'Unknown Employee'}
                                 </div>
-                                <div className="text-sm text-gray-500">
-                                  PF: {employee.pfNumber || 'N/A'}
+                                <div className="text-xs text-gray-500 space-y-1">
+                                  <div className="flex items-center">
+                                    <span className="font-medium">PF:</span>
+                                    <span className="ml-1">{employee.pfNumber || 'N/A'}</span>
+                                  </div>
+                                  <div className="flex items-center">
+                                    <span className="font-medium">Gender:</span>
+                                    <span className="ml-1">{employee.gender || 'N/A'}</span>
+                                  </div>
+                                  {employee.disability && employee.disability !== 'NONE' && (
+                                    <div className="flex items-center text-orange-600">
+                                      <span className="font-medium">Disability:</span>
+                                      <span className="ml-1">{employee.disability}</span>
+                                    </div>
+                                  )}
                                 </div>
                               </div>
                             </div>
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            {employee.department || 'N/A'}
+
+                          {/* Position & Department */}
+                          <td className="px-6 py-4">
+                            <div className="space-y-1">
+                              <div className="text-sm font-medium text-gray-900">
+                                {employee.jobTitle || 'N/A'}
+                              </div>
+                              <div className="text-xs text-gray-600">
+                                <div><strong>Dept:</strong> {employee.department || 'N/A'}</div>
+                                <div><strong>Division:</strong> {employee.division || 'N/A'}</div>
+                                <div><strong>Section:</strong> {employee.section || 'N/A'}</div>
+                              </div>
+                              <div className="flex space-x-1 mt-2">
+                                <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
+                                  employee.empCategory === 'Administrative Staff' 
+                                    ? 'text-blue-600 bg-blue-50'
+                                    : employee.empCategory === 'Academic Staff'
+                                    ? 'text-green-600 bg-green-50'
+                                    : 'text-gray-600 bg-gray-50'
+                                }`}>
+                                  {employee.empCategory || 'N/A'}
+                                </span>
+                              </div>
+                            </div>
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            {employee.role || 'Employee'}
+
+                          {/* Contact & Location */}
+                          <td className="px-6 py-4">
+                            <div className="space-y-1 text-xs text-gray-600">
+                              <div className="flex items-center">
+                                <span className="font-medium">Phone:</span>
+                                <span className="ml-1">{employee.phone || 'N/A'}</span>
+                              </div>
+                              <div className="flex items-center">
+                                <span className="font-medium">Location:</span>
+                                <span className="ml-1">{employee.location || 'N/A'}</span>
+                              </div>
+                              {employee.email && (
+                                <div className="flex items-center">
+                                  <span className="font-medium">Email:</span>
+                                  <span className="ml-1 text-blue-600">{employee.email}</span>
+                                </div>
+                              )}
+                            </div>
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-                              employee.isActive 
-                                ? 'text-green-600 bg-green-50' 
-                                : 'text-red-600 bg-red-50'
-                            }`}>
-                              {employee.isActive ? 'Active' : 'Inactive'}
-                            </span>
+
+                          {/* Employment Info */}
+                          <td className="px-6 py-4">
+                            <div className="space-y-1 text-xs text-gray-600">
+                              <div className="flex items-center">
+                                <span className="font-medium">Category:</span>
+                                <span className="ml-1">{employee.jobCategory || 'N/A'}</span>
+                              </div>
+                              {employee.createdAt && (
+                                <div className="flex items-center">
+                                  <span className="font-medium">Joined:</span>
+                                  <span className="ml-1">
+                                    {new Date(employee.createdAt.seconds * 1000).toLocaleDateString('en-US', {
+                                      year: 'numeric',
+                                      month: 'short',
+                                      day: 'numeric'
+                                    })}
+                                  </span>
+                                </div>
+                              )}
+                              <div className="flex items-center">
+                                <span className="font-medium">Role:</span>
+                                <span className="ml-1">{employee.role || 'Employee'}</span>
+                              </div>
+                            </div>
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            <button className="text-blue-600 hover:text-blue-900 mr-4">
-                              Edit
-                            </button>
-                            <button className="text-red-600 hover:text-red-900">
-                              {employee.isActive ? 'Deactivate' : 'Activate'}
-                            </button>
+
+                          {/* Status & Actions */}
+                          <td className="px-6 py-4">
+                            <div className="space-y-2">
+                              <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
+                                employee.isActive 
+                                  ? 'text-green-600 bg-green-50' 
+                                  : 'text-red-600 bg-red-50'
+                              }`}>
+                                {employee.isActive ? 'Active' : 'Inactive'}
+                              </span>
+                              
+                              {employee.hasPassword && (
+                                <div className="text-xs text-green-600 font-medium">
+                                  ✓ Password Set
+                                </div>
+                              )}
+                              
+                              <div className="flex flex-col space-y-1">
+                                <button className="text-blue-600 hover:text-blue-900 text-xs font-medium">
+                                  View Details
+                                </button>
+                                <button className="text-gray-600 hover:text-gray-900 text-xs font-medium">
+                                  Edit Info
+                                </button>
+                                <button className="text-red-600 hover:text-red-900 text-xs font-medium">
+                                  {employee.isActive ? 'Deactivate' : 'Activate'}
+                                </button>
+                              </div>
+                            </div>
                           </td>
                         </tr>
                       ))
@@ -617,9 +792,7 @@ const AdminPanel = ({
               </div>
             </div>
           </div>
-        )}
-
-        {/* Settings Tab */}
+        )}        {/* Settings Tab */}
         {activeTab === 'settings' && (
           <div className="space-y-6">
             {/* Settings Header */}

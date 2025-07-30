@@ -2,6 +2,7 @@
   "name": "timetracker-admin",
   "version": "0.1.0",
   "private": true,
+  "homepage": "/timetracker-admin/",
   "dependencies": {
     "@tailwindcss/forms": "^0.5.10",
     "@testing-library/dom": "^10.4.1",
